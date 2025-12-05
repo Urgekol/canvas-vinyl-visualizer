@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="UTF-8">
+    <title>Music Disc Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playwrite+NO:wght@100..400&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Knewave&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playwrite+NO:wght@100..400&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="style.css">
+
+  </head>
+  <body>
+
+    <div class="card">
+
+      <div class="upload-button" id="uploadBtnContainer">
+        <label for="uploadInput" class="upload-label">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span class="upload-text">Upload</span>
+        </label>
+        <input id="uploadInput" type="file" accept="image/*" hidden>
+      </div>
+
+      <div class="card-header">
+        <h1>Music Disc Player</h1>
+        <p>Enter your favorite tune</p>
+      </div>
+
+      <div class="form-group">
+        <label for="songName">Song Name</label>
+        <input id="songName" type="text" placeholder="Your Song Title" maxlength="40">
+      </div>
+
+      <div class="form-group">
+        <label for="singerName">Singer</label>
+        <input id="singerName" type="text" placeholder="Artist Name" maxlength="40">
+      </div>
+
+      <div class="form-group">
+        <label for="duration">Duration (seconds)</label>
+        <input id="duration" type="number" min="1" max="60" value="8">
+      </div>
+
+      <!-- Horizontal wallpaper slider -->
+      <div class="wallpaper-slider">
+        <button id="wallLeft" class="wall-arrow-btn">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="slider-container">
+          <ul class="slider-track">
+            <li><img src="layout1.jpeg" alt="layout 1" /></li>
+            <li><img src="layout2.jpeg" alt="layout 2" /></li>
+            <li><img src="layout3.jpeg" alt="layout 3" /></li>
+            <li><img src="layout4.jpeg" alt="layout 4" /></li>
+            <li><img src="layout5.jpeg" alt="layout 5" /></li>
+            <li><img src="layout6.jpeg" alt="layout 6" /></li>
+            <li><img src="layout7.jpeg" alt="layout 7" /></li>
+            <li><img src="layout8.jpeg" alt="layout 8" /></li>
+            <li><img src="layout9.jpeg" alt="layout 9" /></li>
+            <li><img src="layout10.jpeg" alt="layout 10" /></li>
+          </ul>
+        </div>
+
+        <button id="wallRight" class="wall-arrow-btn">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="discCanvas" width="1080" height="1440"></canvas>
+      </div>    
+
+      <button id="downloadBtn" class="btn-download">
+        <span class="icon">⭳</span>
+        <span>Download</span>
+      </button>
+
+    </div>
+
+    <script src="index.js" defer></script>
+
+  </body>
+</html>
