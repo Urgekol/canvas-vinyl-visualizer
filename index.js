@@ -95,7 +95,7 @@ bgImage.src = "layout1.jpeg";
 
 const centerX = INNER_W / 2;
 const centerY = INNER_H * 0.45;
-const discSize = 700;
+const discSize = 600;
 
 let angle = 0;
 
@@ -240,7 +240,7 @@ function drawOuterFrame()
   const paddingY = INNER_Y;
   const width = INNER_W;
   const height = INNER_H;
-  const radius = 60;
+  const radius = 50;
 
   ctx.save();
 
@@ -649,7 +649,6 @@ if (leftBtn && rightBtn)
 const sliderImages = document.querySelectorAll(".slider-track img");
 
 sliderImages.forEach(img => {
-
   img.addEventListener("click", () => {
 
     const src = img.getAttribute("src");
@@ -661,10 +660,10 @@ sliderImages.forEach(img => {
 });
 
 
+
 const uploadInput = document.getElementById("uploadInput");
 
 uploadInput.addEventListener("change", function () {
-  
   const file = this.files[0];
 
   if (!file)
