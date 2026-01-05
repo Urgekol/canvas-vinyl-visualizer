@@ -13,13 +13,29 @@ let singerText = "Artist Name";
 let lastValidSong = "";
 let lastValidSinger = "";
 
+
+const STORY_W = canvas.width;   // 1080
+const STORY_H = canvas.height;  // 1920
+
+const INNER_MARGIN = 100;
+const INNER_W = STORY_W - INNER_MARGIN * 2;
+
+// existing aspect ratio (3:4)
+const INNER_H = Math.round(INNER_W * 4 / 3);
+
+// center vertically
+const INNER_X = INNER_MARGIN;
+const INNER_Y = Math.round((STORY_H - INNER_H) / 2);
+
+
+
 songInput.addEventListener("input", () => {
 
   const raw = songInput.value;
 
   const words = raw.split(/\s+/);
 
-  const invalidWord = words.find(w => w.length > 8);
+  const invalidWord = words.find(w => w.length > 9);
 
   if (!invalidWord) 
   {
@@ -31,8 +47,8 @@ songInput.addEventListener("input", () => {
 
   if (raw.endsWith(" ")) 
   {
-    lastValidSong = raw.trim();
-    songText = lastValidSong || "Your Song Title";
+    lastValidSong = raw;
+    songText = raw.trim() || "Your Song Title";
 
     return;
   }
@@ -52,7 +68,7 @@ singerInput.addEventListener("input", () => {
   if (!invalidWord) 
   {
     lastValidSinger = raw.trim();
-    singerText = lastValidSinger || "Your Song Title";
+    singerText = lastValidSinger || "Artist Name";
 
     return;
   }
@@ -60,7 +76,7 @@ singerInput.addEventListener("input", () => {
   if (raw.endsWith(" ")) 
   {
     lastValidSinger = raw.trim();
-    singerText = lastValidSinger || "Your Song Title";
+    singerText = lastValidSinger || "Artist Name";
 
     return;
   }
@@ -77,8 +93,8 @@ discImage.src = "disc.png";
 const bgImage = new Image();
 bgImage.src = "layout1.jpeg";
 
-const centerX = canvas.width / 2;
-const centerY = 650;
+const centerX = INNER_W / 2;
+const centerY = INNER_H * 0.45;
 const discSize = 700;
 
 let angle = 0;
@@ -115,9 +131,9 @@ function getPlayerMetrics()
     panelTop = centerY;
   }
 
-  if (panelTop + panelHeight > canvas.height) 
+  if (panelTop + panelHeight > INNER_H) 
   {
-    panelTop = canvas.height - panelHeight;
+    panelTop = INNER_H - panelHeight;
   }
 
   return { panelTop, panelHeight };
@@ -126,38 +142,77 @@ function getPlayerMetrics()
 
 function drawBackground() 
 {
-  if (bgImage.complete && bgImage.naturalWidth > 0) 
-  {
-    const imgW = bgImage.naturalWidth;
-    const imgH = bgImage.naturalHeight;
-
-    const canvasRatio = canvas.width / canvas.height;
-    const imgRatio = imgW / imgH;
-
-    let drawW;
-    let drawH;
-
-    if (imgRatio > canvasRatio) 
-    {
-      drawH = canvas.height;
-      drawW = imgRatio * drawH;
-    } 
-    else 
-    {
-      drawW = canvas.width;
-      drawH = drawW / imgRatio;
-    }
-
-    const offsetX = (canvas.width - drawW) / 2;
-    const offsetY = (canvas.height - drawH) / 2;
-
-    ctx.drawImage(bgImage, offsetX, offsetY, drawW, drawH);
-  } 
-  else 
+  if (!bgImage.complete || bgImage.naturalWidth === 0) 
   {
     ctx.fillStyle = "#1f2933";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    return;
   }
+
+  const imgW = bgImage.naturalWidth;
+  const imgH = bgImage.naturalHeight;
+
+  const storyRatio = STORY_W / STORY_H;
+  const imgRatio = imgW / imgH;
+
+
+  let bgW, bgH;
+
+  if (imgRatio > storyRatio) 
+  {
+    bgH = STORY_H;
+    bgW = imgRatio * bgH;
+  } 
+  else 
+  {
+    bgW = STORY_W;
+    bgH = bgW / imgRatio;
+  }
+
+  const bgX = (STORY_W - bgW) / 2;
+  const bgY = (STORY_H - bgH) / 2;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, STORY_W, STORY_H); 
+  ctx.clip();
+  ctx.filter = "blur(28px)";
+  ctx.drawImage(bgImage, bgX, bgY, bgW, bgH);
+  ctx.restore();
+
+
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  ctx.fillRect(0, 0, STORY_W, STORY_H);
+  ctx.restore();
+
+
+  const innerRatio = INNER_W / INNER_H;
+
+  let fgW, fgH;
+
+  if (imgRatio > innerRatio) 
+  {
+    fgH = INNER_H;
+    fgW = imgRatio * fgH;
+  } 
+  else 
+  {
+    fgW = INNER_W;
+    fgH = fgW / imgRatio;
+  }
+
+  const fgX = INNER_X + (INNER_W - fgW) / 2;
+  const fgY = INNER_Y + (INNER_H - fgH) / 2;
+
+  ctx.save();
+
+  roundRectPath(INNER_X, INNER_Y, INNER_W, INNER_H, 60);
+
+  ctx.clip();
+  ctx.drawImage(bgImage, fgX, fgY, fgW, fgH);
+  ctx.restore();
 }
 
 
@@ -181,10 +236,10 @@ function roundRectPath(x, y, w, h, r)
 
 function drawOuterFrame() 
 {
-  const paddingX = 80;
-  const paddingY = 120;
-  const width = canvas.width - paddingX * 2;
-  const height = canvas.height - paddingY * 2;
+  const paddingX = INNER_X;
+  const paddingY = INNER_Y;
+  const width = INNER_W;
+  const height = INNER_H;
   const radius = 60;
 
   ctx.save();
@@ -204,7 +259,7 @@ function drawPlayerUI()
 
   const barY = panelTop + 28;
   const left = 140;
-  const right = canvas.width - 140;
+  const right = INNER_W - 140;
 
   ctx.save();
 
@@ -243,20 +298,23 @@ function drawPlayerUI()
   const solid40 = "900 40px 'Font Awesome 6 Free'";
   const solid64 = "900 64px 'Font Awesome 6 Free'";
 
-  ctx.font = solid40;
-  ctx.fillText("\uf074", 150, rowY);
+  const mid = INNER_W / 2;
 
   ctx.font = solid40;
-  ctx.fillText("\uf048", canvas.width / 2 - 120, rowY);
+  ctx.fillText("\uf074", 150, rowY);              // shuffle 
+
+  ctx.font = solid40;
+  ctx.fillText("\uf048", mid - 120, rowY);        // previous
 
   ctx.font = solid64;
-  ctx.fillText("\uf04b", canvas.width / 2, rowY);
+  ctx.fillText("\uf04b", mid, rowY);              // play
 
   ctx.font = solid40;
-  ctx.fillText("\uf051", canvas.width / 2 + 120, rowY);
+  ctx.fillText("\uf051", mid + 120, rowY);        // next
 
   ctx.font = solid40;
-  ctx.fillText("\uf363", canvas.width - 150, rowY);
+  ctx.fillText("\uf363", INNER_W - 150, rowY);    // repeat 
+
 
   ctx.restore();
 }
@@ -282,7 +340,7 @@ function fitSingleLine(ctx, text, maxWidth, baseSize, minSize, fontFamily, weigh
 
 function wrapToTwoLines(ctx, text, maxWidth, font) 
 {
-  ctx.font = font; // THIS LINE IS THE FIX
+  ctx.font = font; 
 
   const words = text.split(" ");
   let line1 = "";
@@ -307,16 +365,23 @@ function wrapToTwoLines(ctx, text, maxWidth, font)
 }
 
 
-
 function drawFrame() 
 {
   drawBackground();
 
+  ctx.save();
+
+  ctx.beginPath();
+  ctx.rect(INNER_X, INNER_Y, INNER_W, INNER_H);
+  ctx.clip();
+
+  ctx.translate(INNER_X, INNER_Y);
+
   drawPlayerUI();
 
-  ctx.save();
   ctx.translate(centerX, centerY);
   ctx.rotate(angle);
+
 
   if (discImage.complete && discImage.naturalWidth > 0) 
   {
@@ -336,7 +401,6 @@ function drawFrame()
   const maxTextWidth_song = discSize * 0.3;
   const maxTextWidth_singer = discSize * 0.25;
 
-  /* SONG NAME */
   const songFit = fitSingleLine(
     ctx,
     songText,
@@ -416,17 +480,26 @@ Promise.all([
   new Promise(res => {
 
     if (discImage.complete && discImage.naturalWidth > 0)
+    {
       res();
+    }
     else
+    {
       discImage.onload = res;
+    }
+      
   }),
 
   new Promise(res => {
 
     if (bgImage.complete && bgImage.naturalWidth > 0)
+    {
       res();
+    }
     else
+    {
       bgImage.onload = res;
+    }
   })
 ]).then(() => {
   animate();
@@ -478,12 +551,12 @@ async function startRecording()
 
 downloadBtn.addEventListener("click", startRecording);
 
-/*  Horizontal slider logic  */
 
 const track = document.querySelector(".slider-track");
 const items = Array.from(document.querySelectorAll(".slider-track li"));
 const leftBtn = document.getElementById("wallLeft");
 const rightBtn = document.getElementById("wallRight");
+
 
 let currentIndex = 0;
 let itemWidth = 0;
@@ -541,6 +614,7 @@ function updateSlider()
 
 if (leftBtn && rightBtn) 
 {
+
   leftBtn.addEventListener("click", () => {
 
     currentIndex = Math.max(0, currentIndex - 1);
@@ -551,8 +625,10 @@ if (leftBtn && rightBtn)
 
     const maxIndex = Math.max(0, items.length - visibleCount);
     currentIndex = Math.min(maxIndex, currentIndex + 1);
+
     updateSlider();
   });
+
 
   window.addEventListener("load", () => {
 
@@ -568,11 +644,12 @@ if (leftBtn && rightBtn)
 }
 
 
-/*  Clickable wallpapers  */
+/*  clickable wallpapers  */
 
 const sliderImages = document.querySelectorAll(".slider-track img");
 
 sliderImages.forEach(img => {
+
   img.addEventListener("click", () => {
 
     const src = img.getAttribute("src");
@@ -584,11 +661,10 @@ sliderImages.forEach(img => {
 });
 
 
-/*  Upload Background Image  */
-
 const uploadInput = document.getElementById("uploadInput");
 
 uploadInput.addEventListener("change", function () {
+  
   const file = this.files[0];
 
   if (!file)
